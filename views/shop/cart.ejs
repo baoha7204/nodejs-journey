@@ -1,0 +1,21 @@
+<%- include('../includes/head.ejs') %>
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+        <main>
+            <% if(products.length > 0) { %>
+                <ul>
+                    <% products.forEach((product) => { %>
+                        <li>
+                            <p><%= product.title %> (<%= product.qty %>)</p>
+                            <form action="/delete-cart-item" method="POST">
+                                <input type="hidden" name="productId" value="<%= product.id %>" />
+                                <button class="btn">Delete</button>
+                            </form>
+                        </li>
+                    <% } ) %>
+                </ul>
+            <% } %>
+        </main>
+        <%- include('../includes/end.ejs') %>

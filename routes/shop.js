@@ -15,11 +15,13 @@ shopRouter.get("/cart", asyncHandler(shopController.getCart));
 shopRouter.post("/cart", asyncHandler(shopController.postCart));
 
 shopRouter.post(
-  "/delete-cart-item",
+  "/cart-delete-item",
   asyncHandler(shopController.postDeleteCartItem)
 );
 
 shopRouter.get("/orders", asyncHandler(shopController.getOrders));
+
+shopRouter.post("/create-order", asyncHandler(shopController.postCreateOrder));
 
 shopRouter.get("/checkout", asyncHandler(shopController.getCheckout));
 

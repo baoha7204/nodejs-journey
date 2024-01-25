@@ -13,8 +13,7 @@ export const postAddProduct = async (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(null, title, imageUrl, price, description);
-  await product.save();
+  await req.user.createProduct({ title, price, imageUrl, description });
   res.redirect("/admin/products");
 };
 
@@ -24,7 +23,7 @@ export const getEditProduct = async (req, res, next) => {
     return res.redirect("/");
   }
   const { productId } = req.params;
-  const product = await Product.findById(productId);
+  const product = await Product.findByPk(productId);
   if (!product) {
     return res.redirect("/");
   }
@@ -36,25 +35,22 @@ export const getEditProduct = async (req, res, next) => {
   });
 };
 
-export const postEditProduct = (req, res, next) => {
+export const postEditProduct = async (req, res, next) => {
   const { productId } = req.body;
-  const updatedTitle = req.body.title;
-  const updatedImageUrl = req.body.imageUrl;
-  const updatedPrice = req.body.price;
-  const updatedDescription = req.body.description;
-  const updatedProduct = new Product(
-    productId,
-    updatedTitle,
-    updatedImageUrl,
-    updatedPrice,
-    updatedDescription
-  );
-  updatedProduct.save();
+  const title = req.body.title;
+  const imageUrl = req.body.imageUrl;
+  const price = req.body.price;
+  const description = req.body.description;
+  const product = await Product.findByPk(productId);
+  if (!product) {
+    return res.redirect("/");
+  }
+  await product.update({ title, imageUrl, price, description });
   res.redirect("/admin/products");
 };
 
 export const getProducts = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  const products = await req.user.getProducts();
   res.render("admin/products", {
     products,
     pageTitle: "Admin Products",
@@ -64,7 +60,11 @@ export const getProducts = async (req, res, next) => {
 
 export const postDeleteProduct = async (req, res, next) => {
   const { productId } = req.body;
-  await Product.delete(productId);
+  const product = await Product.findByPk(productId);
+  if (!product) {
+    return res.redirect("/");
+  }
+  await product.destroy();
   res.redirect("/admin/products");
 };
 

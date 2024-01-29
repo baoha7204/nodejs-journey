@@ -1,33 +1,24 @@
-import mysql from "mysql2/promise";
-import { Sequelize } from "sequelize";
+import { MongoClient, ServerApiVersion } from "mongodb";
 
-export const sequelize = new Sequelize(
-  process.env.DATABASE,
-  process.env.DATABASE_USERNAME,
-  process.env.DATABASE_PASSWORD,
-  {
-    dialect: "mysql",
-    host: "localhost",
-    port: process.env.PORT,
-  }
-);
+let db;
 
-export const Pool = mysql.createPool({
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: "12345",
-  database: "node_complete",
+const client = new MongoClient(process.env.MONGO_URI, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
 });
 
-export const getConnectionFromPool = async () => {
-  const connection = await pool.getConnection().catch((err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
-  if (!connection) {
-    return null;
+export const mongoConnect = async () => {
+  const connectedClient = await client.connect();
+  db = connectedClient.db("shop");
+  return connectedClient;
+};
+
+export const getDb = () => {
+  if (db) {
+    return db;
   }
-  return connection;
+  throw new Error("No database found!");
 };

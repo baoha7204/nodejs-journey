@@ -18,10 +18,10 @@
                 <tbody>
                     <% orders.forEach(order => { %>
                         <tr>
-                            <td><%= order.id %></td>
+                            <td><%= order._id %></td>
                             <td>
-                                <% order.products.forEach(product => { %>
-                                    <div><%= product.title %> - <%= product.orderItem.quantity %></div>
+                                <% order.items.forEach(item => { %>
+                                    <div><%= item.title %> - <%= item.quantity %></div>
                                 <% }) %>
                             </td>
                         </tr>

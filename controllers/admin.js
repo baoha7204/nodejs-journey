@@ -13,7 +13,15 @@ export const postAddProduct = async (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  await req.user.createProduct({ title, price, imageUrl, description });
+  const product = new Product(
+    title,
+    price,
+    imageUrl,
+    description,
+    null,
+    req.user._id
+  );
+  await product.save();
   res.redirect("/admin/products");
 };
 
@@ -23,7 +31,7 @@ export const getEditProduct = async (req, res, next) => {
     return res.redirect("/");
   }
   const { productId } = req.params;
-  const product = await Product.findByPk(productId);
+  const product = await Product.findById(productId.toString());
   if (!product) {
     return res.redirect("/");
   }
@@ -36,21 +44,21 @@ export const getEditProduct = async (req, res, next) => {
 };
 
 export const postEditProduct = async (req, res, next) => {
-  const { productId } = req.body;
-  const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
-  const price = req.body.price;
-  const description = req.body.description;
-  const product = await Product.findByPk(productId);
-  if (!product) {
-    return res.redirect("/");
-  }
-  await product.update({ title, imageUrl, price, description });
+  const { productId, title, imageUrl, price, description } = req.body;
+  const updatedProduct = new Product(
+    title,
+    price,
+    imageUrl,
+    description,
+    productId,
+    req.user._id
+  );
+  await updatedProduct.save();
   res.redirect("/admin/products");
 };
 
 export const getProducts = async (req, res, next) => {
-  const products = await req.user.getProducts();
+  const products = await Product.fetchAll();
   res.render("admin/products", {
     products,
     pageTitle: "Admin Products",
@@ -60,11 +68,7 @@ export const getProducts = async (req, res, next) => {
 
 export const postDeleteProduct = async (req, res, next) => {
   const { productId } = req.body;
-  const product = await Product.findByPk(productId);
-  if (!product) {
-    return res.redirect("/");
-  }
-  await product.destroy();
+  await Product.deleteById(productId.toString());
   res.redirect("/admin/products");
 };
 

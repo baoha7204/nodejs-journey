@@ -1,8 +1,7 @@
-import Cart from "../models/cart.js";
 import Product from "../models/product.js";
 
 export const getIndex = async (req, res, next) => {
-  const products = await Product.findAll();
+  const products = await Product.fetchAll();
   res.render("shop/index", {
     products,
     pageTitle: "Shop",
@@ -11,7 +10,7 @@ export const getIndex = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
-  const products = await Product.findAll();
+  const products = await Product.fetchAll();
   res.render("shop/product-list", {
     products,
     pageTitle: "Products",
@@ -20,8 +19,9 @@ export const getProducts = async (req, res, next) => {
 };
 
 export const getProduct = async (req, res, next) => {
-  const productId = req.params.productId;
-  const product = await Product.findByPk(productId);
+  const { productId } = req.params;
+  const product = await Product.findById(productId.toString());
+  console.log(product);
   if (!product) {
     return res.redirect("/products");
   }
@@ -33,11 +33,7 @@ export const getProduct = async (req, res, next) => {
 };
 
 export const getCart = async (req, res, next) => {
-  const cart = await req.user.getCart();
-  if (!cart) {
-    return res.redirect("/");
-  }
-  const cartProducts = await cart.getProducts();
+  const cartProducts = await req.user.getCart();
   if (!cartProducts) {
     return res.redirect("/");
   }
@@ -50,76 +46,24 @@ export const getCart = async (req, res, next) => {
 
 export const postCart = async (req, res, next) => {
   const { productId } = req.body;
-
-  const cart = await req.user.getCart();
-  if (!cart) {
+  const user = req.user;
+  const selectedProduct = await Product.findById(productId.toString());
+  if (!selectedProduct) {
     return res.redirect("/");
   }
-
-  const cartProducts = await cart.getProducts({ where: { id: productId } });
-  if (!cartProducts) {
-    return res.redirect("/");
-  }
-
-  let product;
-  if (cartProducts.length > 0) {
-    product = cartProducts[0];
-  }
-
-  let newQuantity = 1;
-  if (product) {
-    const oldQuantity = product.cartItem.quantity;
-    newQuantity = oldQuantity + 1;
-  }
-
-  const selectedProduct = await Product.findByPk(productId);
-  await cart.addProduct(selectedProduct, {
-    through: { quantity: newQuantity },
-  });
-
+  await user.addToCart(selectedProduct);
   res.redirect("/cart");
 };
 
 export const postDeleteCartItem = async (req, res, next) => {
   const { productId } = req.body;
-
-  const cart = await req.user.getCart();
-  if (!cart) {
-    return res.redirect("/");
-  }
-
-  const cartProducts = await cart.getProducts({ where: { id: productId } });
-  if (!cartProducts) {
-    return res.redirect("/");
-  }
-  if (cartProducts.length === 0) {
-    return res.redirect("/");
-  }
-  const product = cartProducts[0];
-  await product.cartItem.destroy();
+  const user = req.user;
+  await user.deleteItemFromCart(productId);
   res.redirect("/cart");
 };
 
 export const getOrders = async (req, res, next) => {
-  const cart = await req.user.getCart();
-  if (!cart) {
-    return res.redirect("/");
-  }
-
-  const cartProducts = await cart.getProducts();
-  if (!cartProducts) {
-    return res.redirect("/");
-  }
-
-  const orders = await req.user.getOrders({ include: ["products"] });
-  orders.forEach((order) => {
-    order.products.forEach((product) => {
-      console.log(product);
-    });
-  });
-  if (!orders) {
-    return res.redirect("/");
-  }
+  const orders = await req.user.getOrders();
 
   res.render("shop/orders", {
     pageTitle: "My Orders",
@@ -129,22 +73,7 @@ export const getOrders = async (req, res, next) => {
 };
 
 export const postCreateOrder = async (req, res, next) => {
-  const cart = await req.user.getCart();
-  if (!cart) {
-    return res.redirect("/");
-  }
-  const cartProducts = await cart.getProducts();
-  if (!cartProducts) {
-    return res.redirect("/");
-  }
-  const order = await req.user.createOrder();
-  await order.addProducts(
-    cartProducts.map((product) => {
-      product.orderItem = { quantity: product.cartItem.quantity };
-      return product;
-    })
-  );
-  await cart.setProducts(null);
+  await req.user.createOrder();
   res.redirect("/orders");
 };
 

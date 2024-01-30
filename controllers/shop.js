@@ -1,7 +1,7 @@
 import Product from "../models/product.js";
 
 export const getIndex = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  const products = await Product.find().exec();
   res.render("shop/index", {
     products,
     pageTitle: "Shop",
@@ -10,7 +10,7 @@ export const getIndex = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  const products = await Product.find().exec();
   res.render("shop/product-list", {
     products,
     pageTitle: "Products",
@@ -20,8 +20,7 @@ export const getProducts = async (req, res, next) => {
 
 export const getProduct = async (req, res, next) => {
   const { productId } = req.params;
-  const product = await Product.findById(productId.toString());
-  console.log(product);
+  const product = await Product.findById(productId);
   if (!product) {
     return res.redirect("/products");
   }
@@ -46,25 +45,22 @@ export const getCart = async (req, res, next) => {
 
 export const postCart = async (req, res, next) => {
   const { productId } = req.body;
-  const user = req.user;
-  const selectedProduct = await Product.findById(productId.toString());
+  const selectedProduct = await Product.findById(productId);
   if (!selectedProduct) {
     return res.redirect("/");
   }
-  await user.addToCart(selectedProduct);
+  await req.user.addToCart(selectedProduct);
   res.redirect("/cart");
 };
 
 export const postDeleteCartItem = async (req, res, next) => {
   const { productId } = req.body;
-  const user = req.user;
-  await user.deleteItemFromCart(productId);
+  await req.user.deleteItemFromCart(productId);
   res.redirect("/cart");
 };
 
 export const getOrders = async (req, res, next) => {
   const orders = await req.user.getOrders();
-
   res.render("shop/orders", {
     pageTitle: "My Orders",
     path: "/orders",

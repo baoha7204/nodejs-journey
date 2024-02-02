@@ -1,6 +1,7 @@
 import express from "express";
 import shopController from "../controllers/shop.js";
 import { asyncHandler } from "../utils/helpers.js";
+import { isAuth } from "../middlewares/is-auth.js";
 
 const shopRouter = express.Router();
 
@@ -10,19 +11,22 @@ shopRouter.get("/products", asyncHandler(shopController.getProducts));
 
 shopRouter.get("/products/:productId", asyncHandler(shopController.getProduct));
 
-shopRouter.get("/cart", asyncHandler(shopController.getCart));
+shopRouter.get("/cart", isAuth, asyncHandler(shopController.getCart));
 
-shopRouter.post("/cart", asyncHandler(shopController.postCart));
+shopRouter.post("/cart", isAuth, asyncHandler(shopController.postCart));
 
 shopRouter.post(
   "/cart-delete-item",
+  isAuth,
   asyncHandler(shopController.postDeleteCartItem)
 );
 
-shopRouter.get("/orders", asyncHandler(shopController.getOrders));
+shopRouter.get("/orders", isAuth, asyncHandler(shopController.getOrders));
 
-shopRouter.post("/create-order", asyncHandler(shopController.postCreateOrder));
-
-shopRouter.get("/checkout", asyncHandler(shopController.getCheckout));
+shopRouter.post(
+  "/create-order",
+  isAuth,
+  asyncHandler(shopController.postCreateOrder)
+);
 
 export default shopRouter;

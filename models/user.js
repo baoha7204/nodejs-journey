@@ -3,11 +3,14 @@ import Order from "./order.js";
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-  username: {
+  email: {
     type: String,
     required: true,
   },
-  email: String,
+  password: {
+    type: String,
+    required: true,
+  },
   cart: {
     items: [
       {
@@ -65,7 +68,7 @@ userSchema.methods.createOrder = async function () {
   const cartProducts = await this.getCart();
   const order = new Order({
     user: {
-      username: this.username,
+      email: this.email,
       userId: this._id,
     },
     products: cartProducts,

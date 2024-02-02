@@ -10,7 +10,8 @@
   margin-bottom: 0.25rem;
 }
 
-.form-control input {
+.form-control input,
+.form-control textarea {
   border: 1px solid #a1a1a1;
   font: inherit;
   border-radius: 2px;

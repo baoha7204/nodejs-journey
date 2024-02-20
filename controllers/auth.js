@@ -1,5 +1,15 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SES_AWS_SMTP_ENDPOINT,
+  port: process.env.SES_AWS_SMTP_PORT,
+  auth: {
+    user: process.env.SES_AWS_SMTP_USERNAME,
+    pass: process.env.SES_AWS_SMTP_PASSWORD,
+  },
+});
 
 export const getLogin = async (req, res, next) => {
   let message = req.flash("error");
@@ -41,6 +51,7 @@ export const postLogin = async (req, res, next) => {
     req.flash("error", "Invalid email or password.");
     return res.redirect("/login");
   }
+
   req.session.user = user;
   await req.session.save();
   res.redirect("/");
@@ -60,6 +71,15 @@ export const postSignup = async (req, res, next) => {
     cart: { items: [] },
   });
   await newUser.save();
+  // send success email
+  const mailOptions = {
+    from: process.env.SES_AWS_SMTP_SENDER,
+    to: email,
+    subject: "Signup status",
+    html: "<h1>You successfully sign up to MyNode app kkk</h1>",
+  };
+  const info = await transporter.sendMail(mailOptions);
+  console.log("Message sent! Message ID: ", info);
   res.redirect("/login");
 };
 

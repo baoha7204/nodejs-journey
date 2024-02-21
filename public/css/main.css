@@ -248,6 +248,12 @@ form {
   color: red;
 }
 
+.user-message--success {
+  border-color: #00695c;
+  background: white;
+  color: #00695c;
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

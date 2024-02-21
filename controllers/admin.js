@@ -30,21 +30,30 @@ export const getEditProduct = async (req, res, next) => {
     return res.redirect("/");
   }
   const { productId } = req.params;
-  const product = await Product.findById(productId).exec();
-  if (!product) {
+  const updatedProduct = await Product.findOne({
+    _id: productId,
+    userId: req.user._id,
+  });
+  if (!updatedProduct) {
     return res.redirect("/");
   }
   res.render("admin/edit-product", {
     pageTitle: "Edit Product",
     path: "/admin/edit-product",
     editing: Boolean(editMode),
-    product,
+    product: updatedProduct,
   });
 };
 
 export const postEditProduct = async (req, res, next) => {
   const { productId, title, imageUrl, price, description } = req.body;
-  const updatedProduct = await Product.findById(productId).exec();
+  const updatedProduct = await Product.findOne({
+    _id: productId,
+    userId: req.user._id,
+  });
+  if (!updatedProduct) {
+    return res.redirect("/admin/products");
+  }
   updatedProduct.title = title;
   updatedProduct.price = price;
   updatedProduct.imageUrl = imageUrl;
@@ -54,7 +63,7 @@ export const postEditProduct = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
-  const products = await Product.find().exec();
+  const products = await Product.find({ userId: req.user._id }).exec();
   res.render("admin/products", {
     products,
     pageTitle: "Admin Products",
@@ -64,7 +73,7 @@ export const getProducts = async (req, res, next) => {
 
 export const postDeleteProduct = async (req, res, next) => {
   const { productId } = req.body;
-  await Product.findByIdAndDelete(productId);
+  await Product.deleteOne({ userId: req.user._id, _id: productId });
   res.redirect("/admin/products");
 };
 

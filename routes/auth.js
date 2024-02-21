@@ -15,4 +15,12 @@ authRouter.post("/signup", asyncHandler(authController.postSignup));
 
 authRouter.post("/logout", isAuth, asyncHandler(authController.postLogout));
 
+authRouter.get("/reset", asyncHandler(authController.getReset));
+
+authRouter.post("/reset", asyncHandler(authController.postReset));
+
+authRouter.get("/reset/:token", asyncHandler(authController.getNewPassword));
+
+authRouter.post("/new-password", asyncHandler(authController.postNewPassword));
+
 export default authRouter;

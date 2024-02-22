@@ -12,6 +12,7 @@ import { asyncHandler, rootPath } from "./utils/helpers.js";
 import { store } from "./utils/db.js";
 import { bindReqUser } from "./middlewares/user.js";
 import { csrfProtection, csrfToken } from "./middlewares/csrf.js";
+import { oldInput } from "./middlewares/oldInput.js";
 
 const app = express();
 app.set("view engine", "ejs");
@@ -28,10 +29,10 @@ app.use(
     store: store,
   })
 );
+app.use(oldInput);
 app.use(csrfProtection);
 app.use(flash());
 app.use(asyncHandler(bindReqUser));
-
 app.use(csrfToken);
 
 app.use("/admin", adminRouter);

@@ -1,14 +1,31 @@
+import { validationResult } from "express-validator";
 import Product from "../models/product.js";
+import { extractFlashMessage } from "../utils/helpers.js";
 
 export const getAddProduct = (req, res, next) => {
+  const errorMessage = extractFlashMessage(req, "error");
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
+    errorMessage,
+    validationErrors: [],
+    oldInput: req.oldInput,
   });
 };
 
 export const postAddProduct = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Add Product",
+      path: "/admin/add-product",
+      editing: false,
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      oldInput: req.oldInput,
+    });
+  }
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
@@ -25,6 +42,7 @@ export const postAddProduct = async (req, res, next) => {
 };
 
 export const getEditProduct = async (req, res, next) => {
+  const errorMessage = extractFlashMessage(req, "error");
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect("/");
@@ -42,10 +60,23 @@ export const getEditProduct = async (req, res, next) => {
     path: "/admin/edit-product",
     editing: Boolean(editMode),
     product: updatedProduct,
+    errorMessage,
+    validationErrors: [],
   });
 };
 
 export const postEditProduct = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Add Product",
+      path: "/admin/add-product",
+      editing: Boolean(req.query.edit),
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      oldInput: req.oldInput,
+    });
+  }
   const { productId, title, imageUrl, price, description } = req.body;
   const updatedProduct = await Product.findOne({
     _id: productId,

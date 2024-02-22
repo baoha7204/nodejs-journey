@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import { validationResult } from "express-validator";
 import User from "../models/user.js";
 import { extractFlashMessage } from "../utils/helpers.js";
 
@@ -21,6 +22,8 @@ export const getLogin = async (req, res, next) => {
     path: "/login",
     errorMessage,
     successMessage,
+    validationErrors: [],
+    oldInput: req.oldInput,
   });
 };
 
@@ -30,10 +33,22 @@ export const getSignup = async (req, res, next) => {
     pageTitle: "Signup",
     path: "/signup",
     errorMessage: message,
+    validationErrors: [],
+    oldInput: req.oldInput,
   });
 };
 
 export const postLogin = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/login", {
+      pageTitle: "Login",
+      path: "/login",
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      oldInput: req.oldInput,
+    });
+  }
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
   if (!user) {
@@ -45,19 +60,23 @@ export const postLogin = async (req, res, next) => {
     req.flash("error", "Invalid email or password.");
     return res.redirect("/login");
   }
-
   req.session.user = user;
   await req.session.save();
   res.redirect("/");
 };
 
 export const postSignup = async (req, res, next) => {
-  const { email, password, confirmPassword } = req.body;
-  const user = await User.findOne({ email: email });
-  if (user) {
-    req.flash("error", "Email already exists. Please login.");
-    return res.redirect("/signup");
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/signup", {
+      pageTitle: "Signup",
+      path: "/signup",
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      oldInput: req.oldInput,
+    });
   }
+  const { email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 12);
   const newUser = new User({
     email: email,

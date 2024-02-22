@@ -1,8 +1,8 @@
 import express from "express";
-import { body } from "express-validator";
 import adminController from "../controllers/admin.js";
 import { asyncHandler } from "../utils/helpers.js";
 import { isAuth } from "../middlewares/is-auth.js";
+import { productValidation } from "../validations/admin.js";
 
 const adminRouter = express.Router();
 
@@ -20,17 +20,7 @@ adminRouter.get("/products", isAuth, asyncHandler(adminController.getProducts));
 adminRouter.post(
   "/add-product",
   isAuth,
-  [
-    body("title", "Title must 3-100 characters long!")
-      .isString()
-      .trim()
-      .isLength({ min: 3, max: 100 }),
-    body("imageUrl", "Image URL is not valid!").isURL(),
-    body("price", "Price format is not valid!").isFloat(),
-    body("description", "Description must 5-400 characters long!")
-      .trim()
-      .isLength({ min: 5, max: 400 }),
-  ],
+  productValidation,
   asyncHandler(adminController.postAddProduct)
 );
 
@@ -45,17 +35,7 @@ adminRouter.get(
 adminRouter.post(
   "/edit-product",
   isAuth,
-  [
-    body("title", "Title must 3-100 characters long!")
-      .isString()
-      .trim()
-      .isLength({ min: 3, max: 100 }),
-    body("imageUrl", "Image URL is not valid!").isURL(),
-    body("price", "Price format is not valid!").isFloat(),
-    body("description", "Description must 5-400 characters long!")
-      .trim()
-      .isLength({ min: 5, max: 400 }),
-  ],
+  productValidation,
   asyncHandler(adminController.postEditProduct)
 );
 

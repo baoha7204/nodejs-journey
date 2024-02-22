@@ -30,19 +30,19 @@
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="form-control">
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="<%= title ? title : oldInput.value('title') %>" class="<%= validationErrors.find(e => e.path === 'title') ? 'invalid' : '' %>">
+                <input type="text" name="title" id="title" value="<%= title || oldInput.value('title') %>" class="<%= validationErrors.find(e => e.path === 'title') ? 'invalid' : '' %>">
             </div>
             <div class="form-control">
                 <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<%= imageUrl ? imageUrl : oldInput.value('imageUrl') %>" class="<%= validationErrors.find(e => e.path === 'imageUrl') ? 'invalid' : '' %>">
+                <input type="text" name="imageUrl" id="imageUrl" value="<%= imageUrl || oldInput.value('imageUrl') %>" class="<%= validationErrors.find(e => e.path === 'imageUrl') ? 'invalid' : '' %>">
             </div>
             <div class="form-control">
                 <label for="price">Price</label>
-                <input type="number" name="price" id="price" step="0.01" value="<%= price ? price : oldInput.value('price') %>" class="<%= validationErrors.find(e => e.path === 'price') ? 'invalid' : '' %>">
+                <input type="number" name="price" id="price" step="0.01" value="<%= price || oldInput.value('price') %>" class="<%= validationErrors.find(e => e.path === 'price') ? 'invalid' : '' %>">
             </div>
             <div class="form-control">
                 <label for="description">Description</label>
-                <textarea name="description" id="description" rows="5" class="<%= validationErrors.find(e => e.path === 'description') ? 'invalid' : '' %>"><%= description ? description : oldInput.value('description') %></textarea>
+                <textarea name="description" id="description" rows="5" class="<%= validationErrors.find(e => e.path === 'description') ? 'invalid' : '' %>"><%= description || oldInput.value('description') %></textarea>
             </div>
             <button class="btn" type="submit"><%= buttonAction %></button>
             <% if(editing) { %>

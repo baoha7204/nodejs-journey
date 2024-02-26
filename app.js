@@ -7,7 +7,7 @@ import flash from "connect-flash";
 import adminRouter from "./routes/admin.js";
 import shopRouter from "./routes/shop.js";
 import authRouter from "./routes/auth.js";
-import { get404Page } from "./controllers/error.js";
+import { errorHandler, get404Page } from "./controllers/error.js";
 import { asyncHandler, rootPath } from "./utils/helpers.js";
 import { store } from "./utils/db.js";
 import { bindReqUser } from "./middlewares/user.js";
@@ -32,8 +32,8 @@ app.use(
 app.use(oldInput);
 app.use(csrfProtection);
 app.use(flash());
-app.use(asyncHandler(bindReqUser));
 app.use(csrfToken);
+app.use(asyncHandler(bindReqUser));
 
 app.use("/admin", adminRouter);
 app.use(shopRouter);
@@ -41,4 +41,6 @@ app.use(authRouter);
 
 // catch all 404
 app.use(get404Page);
+// 505 page
+app.use(errorHandler);
 app.listen(3000);

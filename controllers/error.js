@@ -4,3 +4,12 @@ export const get404Page = (req, res, next) => {
     path: undefined,
   });
 };
+
+export const errorHandler = (err, req, res, next) => {
+  console.error(err);
+  res.render("error", {
+    pageTitle: "Error",
+    path: undefined,
+    message: err.message,
+  });
+};

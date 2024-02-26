@@ -5,6 +5,8 @@ export const bindReqUser = async (req, res, next) => {
     return next();
   }
   const user = await User.findById(req.session.user._id);
-  req.user = user;
+  if (user) {
+    req.user = user;
+  }
   next();
 };

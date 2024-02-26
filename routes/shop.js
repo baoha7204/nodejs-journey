@@ -29,4 +29,10 @@ shopRouter.post(
   asyncHandler(shopController.postCreateOrder)
 );
 
+shopRouter.get(
+  "/orders/:orderId",
+  isAuth,
+  asyncHandler(shopController.getInvoice)
+);
+
 export default shopRouter;

@@ -26,15 +26,15 @@
         <% if (errorMessage) { %>
             <div class="user-message user-message--error"><%= errorMessage %></div>
         <% } %>
-        <form class="product-form" action="<%= action %>" method="POST">
+        <form class="product-form" enctype="multipart/form-data" action="<%= action %>" method="POST">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="form-control">
                 <label for="title">Title</label>
                 <input type="text" name="title" id="title" value="<%= title || oldInput.value('title') %>" class="<%= validationErrors.find(e => e.path === 'title') ? 'invalid' : '' %>">
             </div>
             <div class="form-control">
-                <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<%= imageUrl || oldInput.value('imageUrl') %>" class="<%= validationErrors.find(e => e.path === 'imageUrl') ? 'invalid' : '' %>">
+                <label for="image">Image</label>
+                <input type="file" name="image" id="image" >
             </div>
             <div class="form-control">
                 <label for="price">Price</label>

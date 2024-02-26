@@ -5,7 +5,6 @@ export const productValidation = [
     .isString()
     .trim()
     .isLength({ min: 3, max: 100 }),
-  body("imageUrl", "Image URL is not valid!").isURL(),
   body("price", "Price format is not valid!").isFloat(),
   body("description", "Description must 5-400 characters long!")
     .trim()

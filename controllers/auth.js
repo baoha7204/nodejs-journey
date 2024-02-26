@@ -193,7 +193,7 @@ export const postNewPassword = async (req, res, next) => {
   res.redirect("/login");
 };
 
-const authController = {
+export default {
   getLogin,
   postLogin,
   getSignup,
@@ -204,5 +204,3 @@ const authController = {
   getNewPassword,
   postNewPassword,
 };
-
-export default authController;

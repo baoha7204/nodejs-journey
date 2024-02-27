@@ -1,0 +1,25 @@
+<section class="pagination">
+  <!-- FIRST ITEM -->
+  <% if (current === 1) { %>
+  <a href="#" class="disabled">First</a>
+  <% } else { %>
+  <a href="?page=1">First</a>
+  <% } %>
+  <!-- CURRENT ITEMS -->
+  <% let i = (current > 5) ? current - 4 : 1 %> <% if (i !== 1) { %>
+  <a class="disabled">...</a>
+  <% } %> <% for (; i <= (current + 4) && i <= pages; i++) { %> <% if (i ==
+  current) { %>
+  <a class="active"><%= i %></a>
+  <% } else { %>
+  <a href="?page=<%= i %>"><%= i %></a>
+  <% } %> <% if (i == current + 4 && i < pages) { %>
+  <a class="disabled">...</a>
+  <% } %> <% } %>
+  <!-- LAST ITEM -->
+  <% if (current === pages) { %>
+  <a href="#" class="disabled">Last</a>
+  <% } else { %>
+  <a href="?page=<%= pages %>">Last</a>
+  <% } %>
+</section>

@@ -4,21 +4,37 @@ import PDFDocument from "pdfkit";
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 
+const ITEMS_PER_PAGE = 1;
+
 export const getIndex = async (req, res, next) => {
-  const products = await Product.find().exec();
+  const page = +req.query.page || 1;
+  const totalProducts = await Product.find().countDocuments();
+  const products = await Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .exec();
   res.render("shop/index", {
-    products,
     pageTitle: "Shop",
     path: "/",
+    products,
+    current: page,
+    pages: Math.ceil(totalProducts / ITEMS_PER_PAGE),
   });
 };
 
 export const getProducts = async (req, res, next) => {
-  const products = await Product.find().exec();
+  const page = +req.query.page || 1;
+  const totalProducts = await Product.find().countDocuments();
+  const products = await Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .exec();
   res.render("shop/product-list", {
-    products,
     pageTitle: "Products",
     path: "/products",
+    products,
+    current: page,
+    pages: Math.ceil(totalProducts / ITEMS_PER_PAGE),
   });
 };
 

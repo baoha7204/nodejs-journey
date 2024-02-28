@@ -40,10 +40,10 @@ adminRouter.post(
 );
 
 // /admin/delete-product POST
-adminRouter.post(
-  "/delete-product",
+adminRouter.delete(
+  "/product/:productId",
   isAuth,
-  asyncHandler(adminController.postDeleteProduct)
+  asyncHandler(adminController.deleteProduct)
 );
 
 export default adminRouter;

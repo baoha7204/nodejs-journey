@@ -157,8 +157,8 @@ export const getProducts = async (req, res, next) => {
   });
 };
 
-export const postDeleteProduct = async (req, res, next) => {
-  const { productId } = req.body;
+export const deleteProduct = async (req, res, next) => {
+  const { productId } = req.params;
   const product = await Product.findById(productId);
   if (!product) {
     return res.redirect("/admin/products");
@@ -173,7 +173,7 @@ export const postDeleteProduct = async (req, res, next) => {
     Key: oldImage,
   });
   await Product.deleteOne({ userId: req.user._id, _id: productId });
-  res.redirect("/admin/products");
+  res.status(200).json({ message: "Successfully delete!" });
 };
 
 export default {
@@ -182,5 +182,5 @@ export default {
   getEditProduct,
   postEditProduct,
   getProducts,
-  postDeleteProduct,
+  deleteProduct,
 };

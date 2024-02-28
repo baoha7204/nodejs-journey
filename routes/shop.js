@@ -23,10 +23,16 @@ shopRouter.post(
 
 shopRouter.get("/orders", isAuth, asyncHandler(shopController.getOrders));
 
-shopRouter.post(
-  "/create-order",
+shopRouter.get(
+  "/create-order/success",
   isAuth,
   asyncHandler(shopController.postCreateOrder)
+);
+
+shopRouter.get(
+  "/create-order/cancel",
+  isAuth,
+  asyncHandler(shopController.getCart)
 );
 
 shopRouter.get(

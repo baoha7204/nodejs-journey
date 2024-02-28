@@ -19,14 +19,23 @@
                     <% } ) %>
                 </ul>
                 <hr>
+                <h2>Total: <%= (Math.round(products.reduce((acc, item) => acc + item.quantity * item.product.price, 0) * 100) / 100).toFixed(2) %></h2>
                 <div class="centered">
-                    <form action="/create-order" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                        <button type="submit" class="btn">Order Now!</button>
-                    </form>
+                    <button id="order-btn" class="btn">Order Now!</button>
                 </div>
             <% } else { %>
                 <h1>No Products in Cart!</h1>
             <% } %>
+            <script src="https://js.stripe.com/v3/" ></script>
+            <script>
+                const STRIPE_PUBLIC_KEY = 'pk_test_51OonzrKy6t3Qv1L6xuSgGTzrD46KzQmqNYcZyifmBFJNvFL8NJMqbTriK3oHLTz8HVvJOkvwv0X1QnkkDmKgvS3i0030UJsxQi';
+                const stripe = Stripe(STRIPE_PUBLIC_KEY);
+                const orderBtn = document.getElementById('order-btn');
+                orderBtn.addEventListener('click', () => {
+                    stripe.redirectToCheckout({
+                        sessionId: '<%= sessionId %>'
+                    })
+                })
+            </script>
         </main>
         <%- include('../includes/end.ejs') %>

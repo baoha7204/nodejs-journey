@@ -1,10 +1,12 @@
 import fs from "fs";
 import path from "path";
 import PDFDocument from "pdfkit";
+import Stripe from "stripe";
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 
 const ITEMS_PER_PAGE = 1;
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const getIndex = async (req, res, next) => {
   const page = +req.query.page || 1;
@@ -56,10 +58,28 @@ export const getCart = async (req, res, next) => {
   if (!cartProducts) {
     return res.redirect("/");
   }
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items: cartProducts.map((product) => ({
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: product.product.title,
+          description: product.product.description,
+        },
+        unit_amount: Math.round(product.product.price * 100),
+      },
+      quantity: product.quantity,
+    })),
+    success_url: `${req.protocol}://${req.get("host")}/create-order/success`,
+    cancel_url: `${req.protocol}://${req.get("host")}/create-order/cancel`,
+  });
   res.render("shop/cart", {
     pageTitle: "Cart",
     path: "/cart",
     products: cartProducts,
+    sessionId: session.id,
   });
 };
 
